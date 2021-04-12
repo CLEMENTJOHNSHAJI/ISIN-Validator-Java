@@ -9,6 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
+import java.util.Arrays;
+import java.util.Locale;
+
 /**
  * Servlet implementation class HelloServlet
  */
@@ -24,10 +28,13 @@ public class HelloServlet extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
+    
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		
 		
 		String ISINno = request.getParameter("inputCode"); //Getting response from user
 		PrintWriter writer = response.getWriter(); //Servlet response display 
@@ -50,9 +57,10 @@ public class HelloServlet extends HttpServlet {
 		else if(ISINno.length()!=12) { // Input length validation
 			msg="ISIN Code should have 12 characters";
 		}
-		else if(!ISINno.substring(0,2).matches("^[A-Z]*$")) { // Input country code validation
+		else if(!checkCountryCode(ISINno)) {
 			msg="The first two characters should be a country code";
 		}
+		
 		else if(!ISINno.substring(11).matches("^[0-9]*$")) { // Input check digit format validation
 			msg="The last character should be a check digit";
 		}
@@ -62,49 +70,124 @@ public class HelloServlet extends HttpServlet {
 		}
 		else
 		{
-			boolean validation=codeValidator(ISINno); // Valid ISINcode validation method call
+			/*boolean validation=codeValidator(ISINno); // Valid ISINcode validation method call
 	       	if(validation)
 	       		msg=ISINno+" is Valid";
 	       	else
+	       		msg=ISINno+" is Invalid";*/
+			if(validateCode(ISINno))
+				msg=ISINno+" is Valid";
+			else
 	       		msg=ISINno+" is Invalid";
 		}
 		return msg;
 		//return true;
 		
 	} 
-	public static boolean codeValidator(String isino) {
-		StringBuilder sb = new StringBuilder(); // To modify java string
-        for (char c : isino.substring(0, 12).toCharArray())
-            sb.append(Character.digit(c, 36)); // Decimal value-55
-        if (IsinDigitCheck(sb.toString())){
-        	System.out.print("Valid ISIN no \n");
-        	return true;
-        }
-        else
-        	{
-        	System.out.print("given ISIN no is invalid \n");
-        	return false;
-        	}
-		
-	}
 	
-	static boolean IsinDigitCheck(String number) {
+	public static boolean validateCode(String cc){
+        String converted=convertAscii(cc);
+        char lastChar=cc.charAt(11);
+        int checkdigit=Character.digit(lastChar,10);
         int s1 = 0, s2 = 0;
-        String reverse = new StringBuffer(number).reverse().toString();
-        for (int i = 0; i < reverse.length(); i++){
-            int digit = Character.digit(reverse.charAt(i), 10);
-            //This is for odd digits, they are 1-indexed in the algorithm.
+        int digit;
+        //char ch1;
+        int evenArray[];
+        int oddArray[];
+        evenArray = new int[10];
+        oddArray = new int[10];
+        String reverse = new StringBuffer(converted).reverse().toString();
+        //System.out.println("Reversed value "+reverse);
+        
+        for(int i=0,j=0,k=0; i<reverse.length();i++){
+            //ch1=reverse.charAt(i);
+            digit = Character.digit(reverse.charAt(i), 10);
+            //int no=(int)ch1;
             if (i % 2 == 0){
-                s1 += digit;
-            } else { // Add 2 * digit for 0-4, add 2 * digit - 9 for 5-9.
-                s2 += 2 * digit;
-                if(digit >= 5){
-                    s2 -= 9;
+                digit=digit*2;
+                evenArray[j++]=digit;
+                if(digit>9){
+                    while(digit>0){
+                        
+                        s1=s1+digit%10;
+                        digit=digit/10;
+                    }
                 }
+                else
+                    s1=s1+digit;
+            }
+            
+            else {
+                //digit=no;
+                oddArray[k++]=digit; 
+                    s2=s2+digit;
             }
         }
+       
+        //System.out.println(Arrays.toString(evenArray));
+        //System.out.println(Arrays.toString(oddArray));
+        //System.out.println(s1);
+        //System.out.println(s2);
         
-        return (s1 + s2) % 10 == 0;
+        int sum=s1+s2;
+        //System.out.println(sum);
+        if((findNum(sum, 10)-sum)==checkdigit)
+            return true;
+        else
+        return false;
     }
+     
+     public static String convertAscii(String code){
+        code=code.toUpperCase();
+        int intArray[]; 
+        String converted="";
+        int digit;//declaring array
+        intArray = new int[20];
+        //StringBuilder sb = new StringBuilder(code);
+        for(int i=0; i<code.length()-1;){
+            char ch=code.charAt(i);
+            if(Character.isDigit(ch)){
+                //intArray[i]=ch;
+                converted = converted + ch;
+            }
+            else{
+                digit=(int) ch-55;
+                converted = converted + Integer.toString(digit);
+                //intArray[i]=digit;
+            }i++;
+         }
+         //String converted=Arrays.toString(intArray);
+         //System.out.println(converted);
+         return converted;
+     }
+     
+     
+     
+     private static int findNum(int N, int K)
+    {
+        int rem = (N + K) % K;
+      
+        if (rem == 0)
+            return N;
+        else
+            return N + K - rem;
+    }
+	
+	
+	private static boolean checkCountryCode(String code) {
+		String [] CCODES = Locale.getISOCountries();
+
+	    String [] SPECIALS = {
+	            "EZ","EU","XA","XB","XC","XS"}; 
+	    String [] combined= new String[CCODES.length+SPECIALS.length];
+	    System.arraycopy(CCODES,0,combined,0,CCODES.length);
+	    System.arraycopy(SPECIALS,0,combined,0,SPECIALS.length);
+	    String CC=code.substring(0,2);
+	    CC=CC.toUpperCase();
+        return Arrays.asList(combined).contains(CC);
+        
+    }
+	
+	
 	
 }

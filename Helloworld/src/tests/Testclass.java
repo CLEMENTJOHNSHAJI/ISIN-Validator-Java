@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import javax.servlet.http.*;
 
+
 import net.codejava.javaee.*;
 public class Testclass extends Mockito{
 
@@ -84,7 +85,7 @@ public class Testclass extends Mockito{
 	@Test
 	public void ISINcountryCodeFailureTest() throws Exception {// ISIN format check for country code failure case
 		
-		when(request.getParameter("inputCode")).thenReturn("AB3456789191");
+		when(request.getParameter("inputCode")).thenReturn("AU0000XVGZA3");
         when(response.getWriter()).thenReturn(msg);
  
         myServlet.doPost(request, response);
