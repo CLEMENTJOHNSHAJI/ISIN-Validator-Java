@@ -25,7 +25,7 @@ public class HelloServlet extends HttpServlet {
      */
     public HelloServlet() {
         super();
-        // TODO Auto-generated constructor stub
+        
     }
 
     
@@ -48,7 +48,7 @@ public class HelloServlet extends HttpServlet {
 		writer.close();
 	}
 
-	public static String formatCheck(String ISINno) {
+	public static String formatCheck(String ISINno) { // First checking for format of the input string
 		String msg=null;
 		
 		if(ISINno.isEmpty()) {// Null value validation
@@ -57,7 +57,7 @@ public class HelloServlet extends HttpServlet {
 		else if(ISINno.length()!=12) { // Input length validation
 			msg="ISIN Code should have 12 characters";
 		}
-		else if(!checkCountryCode(ISINno)) {
+		else if(!checkCountryCode(ISINno)) { // Country Code validation
 			msg="The first two characters should be a country code";
 		}
 		
@@ -70,12 +70,7 @@ public class HelloServlet extends HttpServlet {
 		}
 		else
 		{
-			/*boolean validation=codeValidator(ISINno); // Valid ISINcode validation method call
-	       	if(validation)
-	       		msg=ISINno+" is Valid";
-	       	else
-	       		msg=ISINno+" is Invalid";*/
-			if(validateCode(ISINno))
+			if(validateCode(ISINno))  // If the format  is correct, check for ISIN validation
 				msg=ISINno+" is Valid";
 			else
 	       		msg=ISINno+" is Invalid";
@@ -86,27 +81,27 @@ public class HelloServlet extends HttpServlet {
 	} 
 	
 	public static boolean validateCode(String cc){
-        String converted=convertAscii(cc);
-        char lastChar=cc.charAt(11);
-        int checkdigit=Character.digit(lastChar,10);
+        String converted=convertAscii(cc); // function for converting Alphabets to corresponding ASCII value-55 
+        char lastChar=cc.charAt(11); // Saving check digit for reference
+        int checkdigit=Character.digit(lastChar,10); // converting character to integer type
         int s1 = 0, s2 = 0;
         int digit;
-        //char ch1;
-        int evenArray[];
-        int oddArray[];
-        evenArray = new int[10];
-        oddArray = new int[10];
-        String reverse = new StringBuffer(converted).reverse().toString();
+        
+        //int evenArray[];
+        //int oddArray[];
+        //evenArray = new int[10]; // These arrays are for storing the digits at odd and even positions for checking 
+        //oddArray = new int[10];
+        String reverse = new StringBuffer(converted).reverse().toString(); //Reversing the string
         //System.out.println("Reversed value "+reverse);
         
         for(int i=0,j=0,k=0; i<reverse.length();i++){
-            //ch1=reverse.charAt(i);
-            digit = Character.digit(reverse.charAt(i), 10);
+            
+            digit = Character.digit(reverse.charAt(i), 10); //Taking each value from string and checking with ISIN check logic
             //int no=(int)ch1;
-            if (i % 2 == 0){
+            if (i % 2 == 0){// Digits at even positions
                 digit=digit*2;
-                evenArray[j++]=digit;
-                if(digit>9){
+                //evenArray[j++]=digit;
+                if(digit>9){   // If the value after multiplication is double digit, add the digits of number with the s1
                     while(digit>0){
                         
                         s1=s1+digit%10;
@@ -117,9 +112,9 @@ public class HelloServlet extends HttpServlet {
                     s1=s1+digit;
             }
             
-            else {
-                //digit=no;
-                oddArray[k++]=digit; 
+            else { // Digits at odd positions
+              
+                //oddArray[k++]=digit; 
                     s2=s2+digit;
             }
         }
@@ -131,26 +126,27 @@ public class HelloServlet extends HttpServlet {
         
         int sum=s1+s2;
         //System.out.println(sum);
-        if((findNum(sum, 10)-sum)==checkdigit)
+        // FindNum is Checking the smallest value greater than sum divisible by 10
+        if((findNum(sum, 10)-sum)==checkdigit) //Subtract SUM from VALUE giving the check digit:
             return true;
         else
         return false;
     }
      
      public static String convertAscii(String code){
-        code=code.toUpperCase();
-        int intArray[]; 
+        code=code.toUpperCase(); //Converting to uppercase
+        //int intArray[]; 
         String converted="";
-        int digit;//declaring array
-        intArray = new int[20];
+        int digit;
+        //intArray = new int[20];
         //StringBuilder sb = new StringBuilder(code);
         for(int i=0; i<code.length()-1;){
             char ch=code.charAt(i);
-            if(Character.isDigit(ch)){
+            if(Character.isDigit(ch)){ //Checking the character is a digit
                 //intArray[i]=ch;
                 converted = converted + ch;
             }
-            else{
+            else{ //if character is not digit find its ASCII and substract 55 from it
                 digit=(int) ch-55;
                 converted = converted + Integer.toString(digit);
                 //intArray[i]=digit;
@@ -158,7 +154,7 @@ public class HelloServlet extends HttpServlet {
          }
          //String converted=Arrays.toString(intArray);
          //System.out.println(converted);
-         return converted;
+         return converted;  
      }
      
      
@@ -175,16 +171,17 @@ public class HelloServlet extends HttpServlet {
 	
 	
 	private static boolean checkCountryCode(String code) {
-		String [] CCODES = Locale.getISOCountries();
+		String [] CCODES = Locale.getISOCountries(); // Getting already valid ISO country codes
 
 	    String [] SPECIALS = {
 	            "EZ","EU","XA","XB","XC","XS"}; 
+	    // By adding more special codes to the list it is possible to check more valid codes
 	    String [] combined= new String[CCODES.length+SPECIALS.length];
 	    System.arraycopy(CCODES,0,combined,0,CCODES.length);
 	    System.arraycopy(SPECIALS,0,combined,0,SPECIALS.length);
 	    String CC=code.substring(0,2);
 	    CC=CC.toUpperCase();
-        return Arrays.asList(combined).contains(CC);
+        return Arrays.asList(combined).contains(CC); // Checking whether the given code is in the list
         
     }
 	

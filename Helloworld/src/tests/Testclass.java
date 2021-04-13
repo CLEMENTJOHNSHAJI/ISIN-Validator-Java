@@ -14,7 +14,7 @@ import net.codejava.javaee.*;
 public class Testclass extends Mockito{
 
 	
-	HttpServletRequest request = mock(HttpServletRequest.class);       
+	HttpServletRequest request = mock(HttpServletRequest.class); // Giving mock request and response using Mockito
     HttpServletResponse response = mock(HttpServletResponse.class); 
     HelloServlet myServlet =new HelloServlet();
     StringWriter code = new StringWriter();
@@ -191,7 +191,7 @@ public class Testclass extends Mockito{
 	}
 	
 	 @Test
-	    public void testServletSuccess() throws Exception { 
+	    public void testServletSuccessTest() throws Exception { 
 	       
 	        when(request.getParameter("inputCode")).thenReturn("US0378331005");
 	        when(response.getWriter()).thenReturn(msg);
@@ -202,6 +202,17 @@ public class Testclass extends Mockito{
 	      
 	    }
 	    
+	 @Test
+	    public void ISINvalidSuccessTest() throws Exception { 
+	       
+	        when(request.getParameter("inputCode")).thenReturn("AU0000XVGZA3");
+	        when(response.getWriter()).thenReturn(msg);
+	 
+	        myServlet.doPost(request, response);
+	        String result = code.getBuffer().toString().trim();
+	        assertTrue(result.equals("<h1>AU0000XVGZA3 is Valid</h1>") );
+	      
+	    }
 	
 	@Test
 	public void ISINInvalidTest() throws Exception{//  ISIN invalid code check
