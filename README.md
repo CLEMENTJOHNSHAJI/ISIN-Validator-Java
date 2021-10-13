@@ -6,6 +6,12 @@ The structure of an ISIN is defined in ISO 6166 – for more information find th
 
 Hint: Although it says that the ISIN must start with a two-letter country code, it is in fact of no consequence whether the two first letters are a country code. “EU”, “XA”, “XB”, “XC” and “XD” are also valid options (for more information why this is, see here: https://www.anna-web.org/wp- content/uploads/2018/05/ISIN-Guidelines-Version-14_clean.pdf, 2.2 Guidance relating to allocation rules).
 
+1. The program is a Java service which takes an input from the user and validates this input as an ISIN.
+
+2. Junit is used for testing the cases.
+
+3. The program is a REST service and is reachable as an endpoint like http://localhost:8080/test-application/isin-validation/IE00B4L5Y983 (or so).
+
 Acceptancecriteria:
 
 • if the service is given a valid ISIN, it should give corresponding feedback
